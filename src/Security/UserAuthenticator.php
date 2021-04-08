@@ -97,6 +97,7 @@ class UserAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
             return new RedirectResponse($targetPath);
         }
 
+
         /**
          * @var FlashBag
          */
