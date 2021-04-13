@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Item index</h1>
 
-    <a href="{{ path('item_new') }}">Create new</a>
+    {# <a href="{{ path('item_new') }}">Create new</a> #}
     <table class="table">
         <thead>
             <tr>
@@ -43,7 +43,7 @@
                 </td>
                 <td>
                     <a href="{{ path('item_show', {'id': item.id}) }}">show</a>
-                    <a href="{{ path('item_edit', {'id': item.id}) }}">edit</a>
+                    {# <a href="{{ path('item_edit', {'id': item.id}) }}">edit</a> #}
                 </td>
             </tr>
         {% else %}
