@@ -5,6 +5,7 @@
 {% block body %}
     <h1>Item index</h1>
 
+    <a href="{{ path('item_new') }}">Create new</a>
     <table class="table">
         <thead>
             <tr>
@@ -25,9 +26,21 @@
                 <td>{{ item.title }}</td>
                 <td>{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ item.description }}</td>
-                <td>{{ item.category.label }}</td>
+                <td>
+                    {% if item.category %}
+                        {{ item.category.label }}
+                    {% else %}
+                        aucune
+                    {% endif %}                
+                </td>
                 <td>{{ item.user.name }}</td>
-                <td><img width="100px" src="{{ asset('uploads/' ~ item.mainPicture) }}" alt="{{ item.title }}"></td>
+                <td>
+                    {% if item.mainPicture %}
+                        <img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('list')}}" alt="{{ item.title }}">                    
+                    {% else %}
+                        <img src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">  
+                    {% endif %}  
+                </td>
                 <td>
                     <a href="{{ path('item_show', {'id': item.id}) }}">show</a>
                     <a href="{{ path('item_edit', {'id': item.id}) }}">edit</a>
@@ -41,5 +54,4 @@
         </tbody>
     </table>
 
-    <a href="{{ path('item_new') }}">Create new</a>
 {% endblock %}

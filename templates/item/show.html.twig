@@ -25,7 +25,13 @@
             </tr>
             <tr>
                 <th>Category</th>
-                <td>{{ item.category.label }}</td>
+                <td>
+                    {% if item.category %}
+                        {{ item.category.label }}
+                    {% else %}
+                        aucune
+                    {% endif %}   
+                </td>
             </tr>
             <tr>
                 <th>Creator</th>
@@ -33,7 +39,13 @@
             </tr>
             <tr>
                 <th>MainPicture</th>
-                <td>{{ item.mainPicture }}</td>
+                <td>
+                    {% if item.mainPicture %}
+                        <img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('view')}}" alt="{{ item.title }}">                    
+                    {% else %}
+                        <img src="{{ asset('images/no_image.png') | imagine_filter('view')}}" alt="{{ item.title }}">  
+                    {% endif %}                
+                </td>
             </tr>
         </tbody>
     </table>

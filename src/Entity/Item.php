@@ -6,6 +6,7 @@ use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
@@ -21,6 +22,8 @@ class Item
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message = "Le titre est obligatoire.")
+     * @Assert\Length(min=6, max=255, minMessage="Le titre doit faire au moins 6 caractères", maxMessage="Le titre doit faire moins de 255 caractères")
      */
     private $title;
 
@@ -31,6 +34,8 @@ class Item
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank(message = "La description est obligatoire.")
+     * @Assert\Length(min=10, minMessage="Le login doit faire au moins 10 caractères")
      */
     private $description;
 
@@ -50,7 +55,7 @@ class Item
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="item")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="item", cascade={"remove"})
      */
     private $comments;
 

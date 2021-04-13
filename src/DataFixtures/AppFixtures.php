@@ -79,7 +79,6 @@ class AppFixtures extends Fixture
                 $item->setTitle($faker->department())
                     ->setDescription($faker->paragraphs(5, true))
                     ->setCreatedAt($faker->dateTimeBetween('-4 month', '-3 month'))
-                    ->setMainPicture('image_default.jpg')
                     ->setUser($creator)
                     ->setCategory($faker->randomElement($categories));                
                 $manager->persist($item);
