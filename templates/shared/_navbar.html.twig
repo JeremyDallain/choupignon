@@ -10,6 +10,19 @@
 					<li class="nav-item">
 						<a class="nav-link {{ (app.request.attributes.get('_route') == 'app_logout') ? 'active' : '' }}" aria-current="page" href="{{ path('app_logout') }}">Se déconnecter</a>
 					</li>
+					{% if "ROLE_CREATOR" in app.user.roles %}
+						<li class="nav-item">
+							<a class="nav-link {{ (app.request.attributes.get('_route') == 'creator_index') ? 'active' : '' }}" aria-current="page" href="{{ path('creator_index') }}">Mes créations</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link {{ (app.request.attributes.get('_route') == 'creator_new') ? 'active' : '' }}" aria-current="page" href="{{ path('creator_new') }}">New</a>
+						</li>						
+					{% endif %}
+					{% if "ROLE_ADMIN" in app.user.roles %}
+						<li class="nav-item">
+							<a class="nav-link {{ (app.request.attributes.get('_route') == 'admin_index') ? 'active' : '' }}" aria-current="page" href="{{ path('admin_index') }}">Administration</a>
+						</li>					
+					{% endif %}
 				{% else %}
 					<li class="nav-item">
 						<a class="nav-link {{ (app.request.attributes.get('_route') == 'app_register') ? 'active' : '' }}" aria-current="page" href="{{ path('app_register') }}">S'inscrire</a>
@@ -24,11 +37,9 @@
 					<a class="nav-link {{ (app.request.attributes.get('_route') == 'home') ? 'active' : '' }}" aria-current="page" href="{{ path('home') }}">Accueil</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link {{ (app.request.attributes.get('_route') == 'item_index') ? 'active' : '' }}" aria-current="page" href="{{ path('item_index') }}">Items</a>
+					<a class="nav-link {{ (app.request.attributes.get('_route') == 'item_index') ? 'active' : '' }}" aria-current="page" href="{{ path('item_index') }}">Catalogue</a>
 				</li>
-				<li class="nav-item">
-					<a class="nav-link {{ (app.request.attributes.get('_route') == 'creator_new') ? 'active' : '' }}" aria-current="page" href="{{ path('creator_new') }}">New</a>
-				</li>
+				
 			</ul>
 		</div>
 	</div>

@@ -6,13 +6,19 @@ use App\Repository\ItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Blameable\Traits\BlameableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
  */
 class Item
 {
+
+    use TimestampableEntity;
+    use BlameableEntity;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -26,11 +32,6 @@ class Item
      * @Assert\Length(min=6, max=255, minMessage="Le titre doit faire au moins 6 caractères", maxMessage="Le titre doit faire moins de 255 caractères")
      */
     private $title;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $createdAt;
 
     /**
      * @ORM\Column(type="text")
@@ -59,9 +60,20 @@ class Item
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $sortable;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item")
+     */
+    private $pictures;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->pictures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -165,6 +177,48 @@ class Item
             // set the owning side to null (unless already changed)
             if ($comment->getItem() === $this) {
                 $comment->setItem(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSortable(): ?int
+    {
+        return $this->sortable;
+    }
+
+    public function setSortable(int $sortable): self
+    {
+        $this->sortable = $sortable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Picture[]
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(Picture $picture): self
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures[] = $picture;
+            $picture->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(Picture $picture): self
+    {
+        if ($this->pictures->removeElement($picture)) {
+            // set the owning side to null (unless already changed)
+            if ($picture->getItem() === $this) {
+                $picture->setItem(null);
             }
         }
 

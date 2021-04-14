@@ -5,12 +5,15 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\Item;
 use App\Form\ItemType;
+use App\Repository\ItemRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/creator", name="creator_")
@@ -21,9 +24,12 @@ class CreatorController extends AbstractController
      /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(): Response
+    public function index(ItemRepository $itemRepository): Response
     {
-        return $this->render('creator/index.html.twig');
+        $items = $itemRepository->findBy(['user' => $this->getUser()], ['sortable' => "ASC"]);
+        return $this->render('creator/index.html.twig', [
+            'items' => $items
+        ]);
     }
 
     /**
@@ -89,7 +95,9 @@ class CreatorController extends AbstractController
 
             if ($mainPicture !== null) {
 
-                unlink($this->getParameter('images_directory').'/'.$item->getMainPicture());
+                if ($item->getMainPicture()) {
+                    unlink($this->getParameter('images_directory').'/'.$item->getMainPicture());
+                }
                 
                 $date = new DateTime();
 
@@ -132,5 +140,32 @@ class CreatorController extends AbstractController
         }
 
         return $this->redirectToRoute('creator_index');
+    }
+
+
+    /**
+     * @Route("/sort", name="sort_item", methods={"POST"})
+     */
+    public function sort(Request $request, EntityManagerInterface $em, ItemRepository $itemRepository)  
+    {
+        try {
+            $sort = $request->get("sort");
+
+            foreach($sort as $ordre => $itemId) {
+                $item = $itemRepository->find($itemId);
+                $item->setSortable($ordre);
+            }
+            $em->flush();
+        
+            return new JsonResponse([
+                'status' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+        
     }
 }

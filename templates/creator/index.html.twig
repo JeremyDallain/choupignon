@@ -1,55 +1,68 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CreatorController!{% endblock %}
+{% block title %}Hello CreatorController!
+{% endblock %}
+
 
 {% block body %}
-    <div class="row">
-        {% for item in app.user.items %}
-            <div class="col-12 col-md-6 col-xl-4">
-                <div class="card" style="width: 18rem;">
-                    {% if item.mainPicture %}
-                        <img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('list')}}" alt="{{ item.title }}">                    
-                    {% else %}
-                        <img class="card-img-top"  src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">  
-                    {% endif %}  
-                    <div class="card-body">
-                        <h5 class="card-title">{{ item.title }}</h5>
-                        <p class="card-text">{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</p>
-                        <p>{{ item.description | u.truncate(50, "...") | raw }}</p>
-                        <p>
-                            {% if item.category %}
-                                {{ item.category.label }}
-                            {% else %}
-                                aucune
-                            {% endif %}
-                        </p>
-                        <a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+	<ul id="sortable" class="list-unstyled row">
+		{% for item in items %}
+			<li sort="{{ item.id }}" class="col-12 col-sm-6 col-md-4 col-lg-3">
+				<div class="card">
+					{% if item.mainPicture %}
+						<img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('list')}}" alt="{{ item.title }}">
+					{% else %}
+						<img class="card-img-top" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">
+					{% endif %}
+					<div class="card-body">
+						<h5 class="card-title">{{ item.title }}</h5>
+						<p class="card-text">{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</p>
+						<p>{{ item.description | u.truncate(50, "...") | raw }}</p>
+						<p>
+							{% if item.category %}
+								{{ item.category.label }}
+							{% else %}
+								aucune
+							{% endif %}
+						</p>
+						<a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>
+                		<a href="{{ path('creator_edit', {'id': item.id}) }}">edit</a> 
+					</div>
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
 {% endblock %}
-{# 
-<td>{{ item.id }}</td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ item.description }}</td>
-                <td>
-                    {% if item.category %}
-                        {{ item.category.label }}
-                    {% else %}
-                        aucune
-                    {% endif %}                
-                </td>
-                <td>{{ item.user.name }}</td>
-                <td>
-                    {% if item.mainPicture %}
-                        <img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('list')}}" alt="{{ item.title }}">                    
-                    {% else %}
-                        <img src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">  
-                    {% endif %}  
-                </td>
-                <td>
-                    <a href="{{ path('item_show', {'id': item.id}) }}">show</a>
-                    {# <a href="{{ path('item_edit', {'id': item.id}) }}">edit</a> #}
+{# {% block body %}
+    <ul id="sortable" class="list-unstyled">
+        {% for item in items %}
+            <li sort="{{ item.id }}" class="border">
+                <h5 class="card-title">{{ item.title }}</h5>
+                <a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>
+                <a href="{{ path('creator_edit', {'id': item.id}) }}">edit</a> 
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %} #}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(function () {
+            $("#sortable").sortable();
+
+            $("#sortable").on("sortupdate", function (event, ui) {
+                var sortedIDs = $("#sortable").sortable("toArray", {attribute: "sort"});
+                $('#sortable').parent().prepend('<span id="loading">MAJ</span>')
+                $.post("{{ path("creator_sort_item") }}", { sort: sortedIDs }, function (response) {
+                    $('#loading').remove()
+                    if (response.status) {} else {
+                        alert(response.error)
+                    }
+                })
+            });
+
+            $("#sortable").disableSelection();
+        });
+	</script>
+{% endblock %}
