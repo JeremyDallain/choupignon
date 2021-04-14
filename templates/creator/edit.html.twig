@@ -49,7 +49,18 @@
             $("[data-delete]").on("click", function(e) {
                 e.preventDefault();
                 if(confirm("Voulez vous supprimer définitivement cette image ?")) {                
-                    console.log(this);
+                    $.ajax({
+                        url: this.getAttribute('href'),
+                        type: "DELETE",
+                        dataType: "json",
+                        success: function (response) {
+                            console.log(response);
+                            $(response.idPicture).parent().remove();
+                        },
+                        error: function (response) {
+                            console.log('Error:', response);
+                        }
+                    })
                 }
             });
         });

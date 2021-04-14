@@ -205,12 +205,26 @@ class CreatorController extends AbstractController
     }
 
     /**
-     * @Route("/picture/delete/{id}", name="picture_delete", methods={"GET"})
+     * @Route("/picture/delete/{id}", name="picture_delete", methods={"DELETE"})
      */
-    public function deletePicture(Picture $picture, Request $request, EntityManagerInterface $em)
+    public function deletePicture($id, Picture $picture, Request $request, EntityManagerInterface $em)
     {
-        return new JsonResponse([
-            'status' => true
-        ]);
+        try {
+            // supprimer l'image
+            unlink($this->getParameter('images_directory').'/'.$picture->getPath());
+
+            $em->remove($picture);
+            $em->flush();
+        
+            return new JsonResponse([
+                'status' => true,
+                'idPicture' => '#'.$id
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }
