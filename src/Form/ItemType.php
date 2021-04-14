@@ -41,22 +41,23 @@ class ItemType extends AbstractType
                 },
                 'required' => false
             ])
-            ->add('mainPicture', FileType::class, [
-                'label' => 'Votre photo',
+            ->add('pictures', FileType::class, [
+                'label' => 'Vos photos',
+                'multiple' => true,
                 'mapped' => false,
                 'required' => false,
-                'constraints' => [
-                    new Image([
-                        'maxSize' => '5M',
-                        'maxSizeMessage' => "l'image doit faire moins de 5M",
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/gif',
-                            'image/png'
-                        ],
-                        'mimeTypesMessage' => "l'image doit être de type jpg, png ou gif",
-                    ])
-                ]
+                // 'constraints' => [
+                //     new Image([
+                //         'maxSize' => '5M',
+                //         'maxSizeMessage' => "l'image doit faire moins de 5M",
+                //         'mimeTypes' => [
+                //             'image/jpeg',
+                //             'image/gif',
+                //             'image/png'
+                //         ],
+                //         'mimeTypesMessage' => "l'image doit être de type jpg, png ou gif",
+                //     ])
+                // ]
             ])
         ;
     }

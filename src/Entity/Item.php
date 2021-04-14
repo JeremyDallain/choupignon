@@ -61,12 +61,12 @@ class Item
     private $comments;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $sortable;
 
     /**
-     * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item")
+     * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item", cascade={"persist"})
      */
     private $pictures;
 

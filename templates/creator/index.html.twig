@@ -15,7 +15,7 @@
 						<img class="card-img-top" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">
 					{% endif %}
 					<div class="card-body">
-						<h5 class="card-title">{{ item.title }}</h5>
+						<h5 class="card-title">{{ item.id }} - {{ item.title }}</h5>
 						<p class="card-text">{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</p>
 						<p>{{ item.description | u.truncate(50, "...") | raw }}</p>
 						<p>

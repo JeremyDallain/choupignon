@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Item;
+use App\Entity\Picture;
 use App\Form\ItemType;
 use App\Repository\ItemRepository;
+use App\Repository\PictureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,20 +47,23 @@ class CreatorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $mainPicture = $form->get('mainPicture')->getData();
+            $pictures = $form->get('pictures')->getData();
 
-            if ($mainPicture !== null) {
+            foreach ($pictures as $key => $picture) {
+
+                // faire la verification/validation ici ?
 
                 $date = new DateTime();
-
-                $file = $date->getTimestamp(). '.' . $mainPicture->guessExtension();
-
-                $mainPicture->move(
+                $file = $date->getTimestamp().'-'.$key.'.'.$picture->guessExtension();
+                $picture->move(
                     $this->getParameter('images_directory'),
                     $file
                 );
-                
-                $item->setMainPicture($file);
+                $pic = new Picture();
+                $pic->setPath($file)
+                    ->setSortable($key) 
+                    ->setAlt($item->getTitle());
+                $item->addPicture($pic);
             }
 
             $item->setUser($user)
@@ -84,31 +89,32 @@ class CreatorController extends AbstractController
      * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
      * @IsGranted("CAN_EDIT", subject="item", message="ce n'est pas votre item, impossible de l'éditer")
      */
-    public function edit(Request $request, Item $item, ValidatorInterface $validator): Response
+    public function edit(Request $request, Item $item, ValidatorInterface $validator, PictureRepository $pictureRepository): Response
     {
         $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $mainPicture = $form->get('mainPicture')->getData();
+            $pictures = $form->get('pictures')->getData();
 
-            if ($mainPicture !== null) {
+            $countPictures = count($item->getPictures());
 
-                if ($item->getMainPicture()) {
-                    unlink($this->getParameter('images_directory').'/'.$item->getMainPicture());
-                }
-                
+            foreach ($pictures as $key => $picture) {
+
+                // faire la verification/validation ici ?
+
                 $date = new DateTime();
-
-                $file = $date->getTimestamp(). '.' . $mainPicture->guessExtension();
-
-                $mainPicture->move(
+                $file = $date->getTimestamp().'-'.$key.'.'.$picture->guessExtension();
+                $picture->move(
                     $this->getParameter('images_directory'),
                     $file
                 );
-                
-                $item->setMainPicture($file);
+                $pic = new Picture();
+                $pic->setPath($file)
+                    ->setSortable($countPictures + $key)
+                    ->setAlt($item->getTitle());
+                $item->addPicture($pic);
             }
 
             $this->getDoctrine()->getManager()->flush();
@@ -117,7 +123,10 @@ class CreatorController extends AbstractController
             return $this->redirectToRoute('creator_index');
         }
 
+        $pictures = $pictureRepository->findBy(['item' => $item->getId()], ['sortable' => "ASC"]);
+
         return $this->render('creator/edit.html.twig', [
+            'pictures' => $pictures,
             'item' => $item,
             'form' => $form->createView(),
         ]);
@@ -144,9 +153,9 @@ class CreatorController extends AbstractController
 
 
     /**
-     * @Route("/sort", name="sort_item", methods={"POST"})
+     * @Route("/sort/item", name="sort_item", methods={"POST"})
      */
-    public function sort(Request $request, EntityManagerInterface $em, ItemRepository $itemRepository)  
+    public function sortItem(Request $request, EntityManagerInterface $em, ItemRepository $itemRepository)  
     {
         try {
             $sort = $request->get("sort");
@@ -167,5 +176,41 @@ class CreatorController extends AbstractController
             ]);
         }
         
+    }
+
+    /**
+     * @Route("/sort/picture", name="sort_picture", methods={"POST"})
+     */
+    public function sortPicture(Request $request, EntityManagerInterface $em, PictureRepository $pictureRepository)  
+    {
+        try {
+            $sort = $request->get("sort");
+
+            foreach($sort as $ordre => $pictureId) {
+                $picture = $pictureRepository->find($pictureId);
+                $picture->setSortable($ordre);
+            }
+            $em->flush();
+        
+            return new JsonResponse([
+                'status' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+        
+    }
+
+    /**
+     * @Route("/picture/delete/{id}", name="picture_delete", methods={"GET"})
+     */
+    public function deletePicture(Picture $picture, Request $request, EntityManagerInterface $em)
+    {
+        return new JsonResponse([
+            'status' => true
+        ]);
     }
 }

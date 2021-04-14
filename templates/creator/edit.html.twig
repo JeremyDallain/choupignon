@@ -10,4 +10,48 @@
     <a href="{{ path('item_index') }}">back to list</a>
 
     {{ include('creator/_delete_form.html.twig') }}
+
+    <hr>
+    <div id="sortable" class="row">
+        {% for picture in pictures %}
+            <div sort="{{ picture.id }}" class="col-2">
+                <img src="{{ asset('uploads/' ~ picture.path) | imagine_filter('list')}}" alt="{{ picture.alt }}">
+                <a class="btn btn-danger" data-delete id="{{ picture.id }}" href="{{ path('creator_picture_delete', {id: picture.id}) }}">Supprimer</a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(function () {
+            $("#sortable").sortable();
+
+            $("#sortable").on("sortupdate", function (event, ui) {
+                var sortedIDs = $("#sortable").sortable("toArray", {attribute: "sort"});
+                $('#sortable').parent().prepend('<span id="loading">MAJ</span>')
+                $.post("{{ path("creator_sort_picture") }}", { sort: sortedIDs }, function (response) {
+                    $('#loading').remove()
+                    if (response.status) {
+
+                    } else {
+                        alert(response.error)
+                    }
+                })
+            });
+
+            $("#sortable").disableSelection();
+        });
+
+        $(function () {
+            $("[data-delete]").on("click", function(e) {
+                e.preventDefault();
+                if(confirm("Voulez vous supprimer définitivement cette image ?")) {                
+                    console.log(this);
+                }
+            });
+        });
+	</script>
 {% endblock %}
