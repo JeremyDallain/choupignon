@@ -1,11 +1,8 @@
-<footer class="bg-success">
-    
+<footer class="bg-success">    
     {% if is_granted('IS_IMPERSONATOR') %}
         <a href="https://127.0.0.1:8000/?_switch_user=_exit">exit</a>
     {% else %}
-        <a href="https://127.0.0.1:8000/?_switch_user=	
-creator1@gmail.com">creator1</a>
-        <a href="https://127.0.0.1:8000/?_switch_user=	
-user1@gmail.com">user1</a> 
+        <a href="https://127.0.0.1:8000/?_switch_user=creator1@gmail.com">creator1</a>
+        <a href="https://127.0.0.1:8000/?_switch_user=user1@gmail.com">user1</a> 
     {% endif %}
 </footer>

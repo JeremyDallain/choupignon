@@ -29,7 +29,7 @@ class AppFixtures extends Fixture
         $admin = new User();
             $admin->setEmail("admin@gmail.com")
                 ->setName("admin")
-                ->setRoles(['ROLE_ADMIN'])
+                ->setRoles(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'])
                 ->setRegisteredAt($faker->dateTimeBetween('-6 month', '-5 month'))
                 ->setPassword($this->encoder->encodePassword($admin, "password"));         
             $manager->persist($admin);
