@@ -23,6 +23,9 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
+        /**
+         * @var \Faker\Generator $faker
+         */
         $faker = Factory::create('fr_FR');
         $faker->addProvider(new \Bezhanov\Faker\Provider\Commerce($faker));
 

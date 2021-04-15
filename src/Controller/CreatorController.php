@@ -4,18 +4,20 @@ namespace App\Controller;
 
 use DateTime;
 use App\Entity\Item;
-use App\Entity\Picture;
 use App\Form\ItemType;
+use App\Entity\Picture;
+use App\Services\ItemFactory;
 use App\Repository\ItemRepository;
+use App\Services\ItemPicturesAdder;
 use App\Repository\PictureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/creator", name="creator_")
@@ -37,11 +39,11 @@ class CreatorController extends AbstractController
     /**
      * @Route("/new", name="new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, ItemFactory $itemFactory, ItemPicturesAdder $itemPicturesAdder): Response
     {
         $user = $this->getUser();
 
-        $item = new Item();
+        $item = $itemFactory->create();
         $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
 
@@ -49,26 +51,8 @@ class CreatorController extends AbstractController
 
             $pictures = $form->get('pictures')->getData();
 
-            foreach ($pictures as $key => $picture) {
-
-                // faire la verification/validation ici ?
-
-                $date = new DateTime();
-                $file = $date->getTimestamp().'-'.$key.'.'.$picture->guessExtension();
-                $picture->move(
-                    $this->getParameter('images_directory'),
-                    $file
-                );
-                $pic = new Picture();
-                $pic->setPath($file)
-                    ->setSortable($key) 
-                    ->setAlt($item->getTitle());
-                $item->addPicture($pic);
-            }
-
-            $item->setUser($user)
-                ->setCreatedAt(new DateTime());
-
+            $itemPicturesAdder->add($item, $pictures);
+            
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($item);
             $entityManager->flush();

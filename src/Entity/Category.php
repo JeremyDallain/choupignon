@@ -17,22 +17,22 @@ class Category
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $label;
+    private string $label;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $color;
+    private string $color;
 
     /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="category")
      */
-    private $items;
+    private ArrayCollection $items;
 
     public function __construct()
     {

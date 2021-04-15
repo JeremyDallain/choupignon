@@ -34,6 +34,7 @@ class Picture
 
     /**
      * @ORM\ManyToOne(targetEntity=Item::class, inversedBy="pictures")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $item;
 

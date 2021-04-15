@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\ItemRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Picture;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ItemRepository;
+use Doctrine\Common\Collections\Collection;
 use Gedmo\Blameable\Traits\BlameableEntity;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
@@ -41,17 +42,15 @@ class Item
     private $description;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $mainPicture;
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="items")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="items")
+     * @ORM\JoinColumn(nullable=false)
+     * @Assert\NotBlank(message = "La catégorie est obligatoire.")
      */
     private $category;
 
@@ -67,6 +66,7 @@ class Item
 
     /**
      * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item", cascade={"persist"})
+     * @ORM\OrderBy({"sortable" = "ASC"})
      */
     private $pictures;
 
@@ -113,18 +113,6 @@ class Item
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getMainPicture(): ?string
-    {
-        return $this->mainPicture;
-    }
-
-    public function setMainPicture(string $mainPicture): self
-    {
-        $this->mainPicture = $mainPicture;
 
         return $this;
     }
@@ -221,7 +209,11 @@ class Item
                 $picture->setItem(null);
             }
         }
-
         return $this;
+    }
+    public function getMainPicture()
+    {
+        $pictures = $this->getPictures();
+        return $pictures->first();
     }
 }
