@@ -1,0 +1,6 @@
+p_rayno_cas_auth:
+    server_login_url: '%env(resolve:SERVER_LOGIN_URL)%'
+    server_validation_url: '%env(resolve:SERVER_VALIDATION_URL)%'
+    server_logout_url: '%env(resolve:SERVER_LOGOUT_URL)%'
+    xml_namespace: cas
+#    options:[] see http://docs.guzzlephp.org/en/latest/request-options.html

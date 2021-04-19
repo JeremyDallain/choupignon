@@ -41,8 +41,6 @@ class CreatorController extends AbstractController
      */
     public function new(Request $request, ItemFactory $itemFactory, ItemPicturesAdder $itemPicturesAdder): Response
     {
-        $user = $this->getUser();
-
         $item = $itemFactory->create();
         $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
