@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Event\RegisterSuccessEvent;
 use DateTime;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\UserAuthenticator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,7 +20,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, GuardAuthenticatorHandler $guardHandler, UserAuthenticator $authenticator): Response
+    public function register(EventDispatcherInterface $dispatcher, Request $request, UserPasswordEncoderInterface $passwordEncoder, GuardAuthenticatorHandler $guardHandler, UserAuthenticator $authenticator): Response
     {
         if ($this->getUser()) {
             $this->addFlash('secondary', 'Vous êtes déjà connecté en tant que : '.$this->getUser()->getName());
@@ -44,6 +46,10 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             // do anything else you need here, like send an email
+
+            //mon event ici : logger "*** s'est créé un compte, son mail : ***"
+            $userEvent = new RegisterSuccessEvent($user, $request);
+            $dispatcher->dispatch($userEvent, 'register.success');
 
             $this->addFlash('success', 'Compte créé avec succés !');
             return $guardHandler->authenticateUserAndHandleSuccess(
