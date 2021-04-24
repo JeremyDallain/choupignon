@@ -41,18 +41,14 @@
                 <th>MainPicture</th>
                 <td>
                     {% if item.mainPicture %}
-                        <img src="{{ asset('uploads/' ~ item.mainPicture) | imagine_filter('view')}}" alt="{{ item.title }}">                    
+                        <img src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('view')}}" alt="{{ item.title }}">
                     {% else %}
-                        <img src="{{ asset('images/no_image.png') | imagine_filter('view')}}" alt="{{ item.title }}">  
-                    {% endif %}                
+                        <img src="{{ asset('images/no_image.png') | imagine_filter('view')}}" alt="{{ item.title }}">
+                    {% endif %}
                 </td>
             </tr>
         </tbody>
     </table>
 
     <a href="{{ path('item_index') }}">back to list</a>
-
-    {# <a href="{{ path('item_edit', {'id': item.id}) }}">edit</a> #}
-
-    {# {{ include('item/_delete_form.html.twig') }} #}
 {% endblock %}

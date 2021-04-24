@@ -122,10 +122,14 @@ class CreatorController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$item->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
+
+            foreach ($item->getPictures() as $picture) {
+                unlink($this->getParameter('images_directory').'/'.$picture->getPath());
+//                $item = $item->removePicture($picture);
+            }
+
             $entityManager->remove($item);
             $entityManager->flush();
-
-            unlink($this->getParameter('images_directory').'/'.$item->getMainPicture());
 
             $this->addFlash('success', 'Objet supprimé.');
         }

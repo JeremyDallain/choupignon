@@ -24,8 +24,10 @@ class ItemController extends AbstractController
      */
     public function index(ItemRepository $itemRepository): Response
     {
+        $items = $itemRepository->findBy([], ['createdAt' => 'DESC']);
+//        dd($items);
         return $this->render('item/index.html.twig', [
-            'items' => $itemRepository->findBy([], ['createdAt' => 'DESC']),
+            'items' => $items
         ]);
     }
     

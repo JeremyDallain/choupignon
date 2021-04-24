@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Item
 {
-
     use TimestampableEntity;
     use BlameableEntity;
 
@@ -62,10 +61,10 @@ class Item
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $sortable;
+    private $sortable = 999;
 
     /**
-     * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Picture::class, mappedBy="item", cascade={"persist", "remove"})
      * @ORM\OrderBy({"sortable" = "ASC"})
      */
     private $pictures;
