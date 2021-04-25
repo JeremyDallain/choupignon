@@ -1,25 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Item{% endblock %}
+{% block title %}{{ item.id ? 'Modifier' : 'Partager' }} une création{% endblock %}
 
 {% block body %}
-    <h1>Edit Item</h1>
-
-    {{ include('creator/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('item_index') }}">back to list</a>
-
-    {{ include('creator/_delete_form.html.twig') }}
-
-    <hr>
-    <div id="sortable" class="row">
-        {% for picture in pictures %}
-            <div sort="{{ picture.id }}" class="col-2">
-                <img src="{{ asset('uploads/' ~ picture.path) | imagine_filter('list')}}" alt="{{ picture.alt }}">
-                <a class="btn btn-danger" data-delete id="{{ picture.id }}" href="{{ path('creator_picture_delete', {id: picture.id}) }}">Supprimer</a>
-            </div>
-        {% endfor %}
+    <h1>{{ item.id ? 'Modifier' : 'Partager' }} une création</h1>
+    <div class="my-4">
+        <a class="btn btn-light" href="{{ path('creator_index') }}">Retour</a>
     </div>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-primary">{{ button_label|default('Valider') }}</button>
+        {% if item.id %}
+            <a class="btn btn-danger" href="{{ path('creator_delete', {id: item.id}) }}" onClick="return (confirm('êtes vous sûr de vouloir supprimer cette création ?'))">Supprimer</a>
+        {% endif %}
+
+
+    {{ form_end(form) }}
+
+    {% if item.id %}
+        <hr>
+        <h2 class="text-center py-3">Ordre d'affichage des photos</h2>
+
+        <div class="row">
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <p class="text-center"><span class="badge bg-secondary fs-6">Image principale</span></p>
+{#                <p class="text-center"><i class="fas text-secondary fa-lg fa-arrow-circle-down"></i></p>#}
+            </div>
+        </div>
+
+        <div id="sortable" class="row">
+            {% for picture in pictures %}
+                <div sort="{{ picture.id }}" class="col-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="p-2 position-relative">
+                        <a class="btn btn-danger position-absolute bottom-0 end-0" data-delete id="{{ picture.id }}" href="{{ path('creator_picture_delete', {id: picture.id}) }}"><i class="far fa-trash-alt"></i></a>
+                        <img class="img-fluid" src="{{ asset('uploads/' ~ picture.path) | imagine_filter('edit_other')}}" alt="{{ picture.alt }}">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
 {% endblock %}
 
 
@@ -31,11 +53,9 @@
 
             $("#sortable").on("sortupdate", function (event, ui) {
                 var sortedIDs = $("#sortable").sortable("toArray", {attribute: "sort"});
-                $('#sortable').parent().prepend('<span id="loading">MAJ</span>')
                 $.post("{{ path("creator_sort_picture") }}", { sort: sortedIDs }, function (response) {
-                    $('#loading').remove()
                     if (response.status) {
-
+                        console.log('ok')
                     } else {
                         alert(response.error)
                     }
@@ -55,7 +75,7 @@
                         dataType: "json",
                         success: function (response) {
                             console.log(response);
-                            $(response.idPicture).parent().remove();
+                            $(response.idPicture).parent().parent().remove();
                         },
                         error: function (response) {
                             console.log('Error:', response);

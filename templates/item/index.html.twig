@@ -1,56 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Item index{% endblock %}
+{% block title %}Catalogue des Créations{% endblock %}
 
 {% block body %}
-    <h1>Item index</h1>
-
-    {# <a href="{{ path('item_new') }}">Create new</a> #}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>CreatedAt</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Createur</th>
-                <th>MainPicture</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <h1>Catalogue des Créations</h1>
+{#    {{ dump(items[0]) }}#}
+    <div class="row">
         {% for item in items %}
-            <tr>
-                <td>{{ item.id }}</td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ item.description }}</td>
-                <td>
-                    {% if item.category %}
-                        {{ item.category.label }}
-                    {% else %}
-                        aucune
-                    {% endif %}                
-                </td>
-                <td>{{ item.user.name }}</td>
-                <td>
-                    {% if item.mainPicture %}
-                        <img src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('list')}}" alt="{{ item.title }}">
-                    {% else %}
-                        <img src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ path('item_show', {'id': item.id}) }}">show</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
+            <div class="col-12 col-lg-6 col-xxl-4 p-3">
+                <div class="card">
+                    <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+                        <span class="category-badge-card badge" style="background-color: {{ item.category.color }}">{{ item.category.label }}</span>
+                        {% if item.mainPicture %}
+                            <img class="img-fluid img-thumbnail" src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('list')}}" alt="{{ item.title }}">
+                        {% else %}
+                            <img class="img-fluid img-thumbnail" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">
+                        {% endif %}
+                        <a href="{{ path('item_show', {'id': item.id}) }}">
+                            <div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ item.title }}</h3>
+                        <p class="card-text">
+                            Réalisé par <span class="text-uppercase fs-5">{{ item.user.name }}</span> le <span class="fs-5">{{ item.createdAt | format_datetime('short', 'none', locale='fr')}}</span>
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <a class="btn btn-primary" href="{{ path('item_show', {'id': item.id}) }}">Voir</a>
+                            {% if item.comments | length > 0 %}
+                                <span><i class="far fa-comments"></i> ({{ item.comments | length }})</span>
+                            {% else %}
+                                <span>aucun commentaire</span>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
+    </div>
 
 {% endblock %}

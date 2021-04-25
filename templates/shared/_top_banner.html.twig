@@ -1,0 +1,19 @@
+{% if app.request.attributes.get('_route') == "home" %}
+    <div class="p-5 text-center bg-image"
+         style="
+             background-image: url('{{ asset('images/tools.jpg') }}');
+             height: 100vh;
+         "
+    >
+        <div class="mask">
+            <div class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-dark">
+                    <h1 class="mb-3">Bienvenue sur Choupignon</h1>
+                    <h4 class="mb-3">Site de partage de création</h4>
+                    <a class="btn btn-outline-dark btn-lg" href="" role="button">Le catalogue</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+{% endif %}

@@ -23,15 +23,13 @@ class ItemType extends AbstractType
                 'label' => "Nom de la création",
                 'attr' => [
                     'placeholder' => "nom de la création"
-                ],
-                'required' => false
+                ]
             ])
             ->add('description', TextareaType::class, [
                 'label' => "Description de la création",
                 'attr' => [
                     'placeholder' => "description de la création"
-                ],
-                'required' => false
+                ]
             ])
             ->add('category', EntityType::class, [
                 'label' => 'Catégorie',
@@ -39,8 +37,7 @@ class ItemType extends AbstractType
                 'class' => Category::class,
                 'choice_label' => function (Category $category) {
                     return $category->getLabel();
-                },
-                'required' => false
+                }
             ])
             ->add('pictures', FileType::class, [
                 'label' => 'Vos photos',

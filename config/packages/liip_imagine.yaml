@@ -6,8 +6,16 @@ liip_imagine:
         list:
             quality: 85
             filters:
-                thumbnail: { size: [100, 100], mode: outbound }
+                thumbnail: { size: [700, 600], mode: outbound }
         view:
             quality: 85
             filters:
-                thumbnail: { size: [300, 200], mode: outbound }
+                thumbnail: { size: [950, 800], mode: outbound }
+        edit_other:
+            quality: 85
+            filters:
+                thumbnail: { size: [ 300, 300 ], mode: outbound }
+        creator_list:
+            quality: 85
+            filters:
+                thumbnail: { size: [ 200, 200 ], mode: outbound }

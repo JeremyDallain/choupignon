@@ -1,3 +1,28 @@
-@import "custom";
-@import "~bootstrap/scss/bootstrap";
-@import "style";
+@import "mdb.min.scss";
+
+@import "tools.scss";
+
+body {
+  font-family: 'New Tegomin', serif;
+
+  .top-alert {
+    margin: 80px 0 0 80px;
+    z-index: 10;
+  }
+
+  main {
+    margin: 60px 0 100px;
+  }
+
+  h1 {
+    text-align: center;
+    margin: 50px 0;
+  }
+
+  .category-badge-card {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+  }
+
+}
