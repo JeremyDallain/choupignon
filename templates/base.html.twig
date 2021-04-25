@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100">
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Choupignon{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=New+Tegomin&display=swap" rel="stylesheet">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}            
         {% endblock %}
@@ -12,15 +14,28 @@
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script src="https://kit.fontawesome.com/504ae21945.js" crossorigin="anonymous"></script>
     </head>
-    <body>
-        {% include "shared/_navbar.html.twig" %}
+    <body class="d-flex flex-column h-100">
         {% include "shared/_alerts.html.twig" %}
-        <div class="container">        
-            {% block body %}{% endblock %}
-        </div>
-        {% include "shared/_footer.html.twig" %}
+        <header>
+            {% include "shared/_navbar.html.twig" %}
+            {% include "shared/_top_banner.html.twig" %}
+        </header>
+        <main class="flex-shrink-0">
+            <div class="container">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+        <footer class="mt-auto text-center text-dark bg-light">
+{#            {% include "shared/_bottom_banner.html.twig" %}#}
+            {% include "shared/_footer.html.twig" %}
+        </footer>
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            <script>
+                $(function () {
+                    $(".top-alert").delay(8000).fadeOut(2000);
+                });
+            </script>
         {% endblock %}
     </body>
 </html>

@@ -59,7 +59,7 @@ class CreatorController extends AbstractController
             return $this->redirectToRoute('creator_index');
         }
 
-        return $this->render('creator/new.html.twig', [
+        return $this->render('creator/edit.html.twig', [
             'item' => $item,
             'form' => $form->createView(),
         ]);
@@ -115,24 +115,23 @@ class CreatorController extends AbstractController
     }
 
     /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
+     * @Route("/delete/{id}", name="delete", methods={"GET"})
      * @IsGranted("CAN_DELETE", subject="item", message="ce n'est pas votre item, impossible de le supprimer")
      */
     public function delete(Request $request, Item $item): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$item->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
 
-            foreach ($item->getPictures() as $picture) {
-                unlink($this->getParameter('images_directory').'/'.$picture->getPath());
+        $entityManager = $this->getDoctrine()->getManager();
+
+        foreach ($item->getPictures() as $picture) {
+            unlink($this->getParameter('images_directory').'/'.$picture->getPath());
 //                $item = $item->removePicture($picture);
-            }
-
-            $entityManager->remove($item);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Objet supprimé.');
         }
+
+        $entityManager->remove($item);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Objet supprimé.');
 
         return $this->redirectToRoute('creator_index');
     }

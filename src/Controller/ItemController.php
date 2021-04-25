@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
+use App\Form\CommentType;
 use DateTime;
 use App\Entity\Item;
 use App\Form\ItemType;
@@ -25,7 +27,7 @@ class ItemController extends AbstractController
     public function index(ItemRepository $itemRepository): Response
     {
         $items = $itemRepository->findBy([], ['createdAt' => 'DESC']);
-//        dd($items);
+//        dump($items);
         return $this->render('item/index.html.twig', [
             'items' => $items
         ]);
@@ -33,21 +35,37 @@ class ItemController extends AbstractController
     
 
     /**
-     * @Route("/{id}", name="show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET", "POST"})
      */
-    public function show(Item $item): Response
+    public function show(Item $item, Request $request, EntityManagerInterface $em): Response
     {
         if (!$item) {
             $this->addFlash('danger', "L'objet demandé n'existe pas.");
             return $this->redirectToRoute('item_index');
         }
 
-        dump($item);
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $comment->setUser($this->getUser())
+                ->setItem($item)
+                ->setPostedAt(new DateTime);
+
+            $em->persist($comment);
+            $em->flush();
+
+            $this->addFlash('success', 'Votre commentaire a été soumis avec succés');
+            return $this->redirectToRoute('item_show', [
+                'id' => $item->getId()
+            ]);
+        }
 
         return $this->render('item/show.html.twig', [
             'item' => $item,
+            'form' => $form->createView()
         ]);
-    }
-
-    
+    }    
 }

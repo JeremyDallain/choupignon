@@ -49,12 +49,12 @@ class User implements UserInterface
     private $registeredAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Item::class, mappedBy="user", cascade={"remove"})
      */
     private $items;
 
     /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", cascade={"remove"})
      */
     private $comments;
 

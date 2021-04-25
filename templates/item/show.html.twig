@@ -3,52 +3,132 @@
 {% block title %}Item{% endblock %}
 
 {% block body %}
-    <h1>Item</h1>
+    <h1>{{ item.title }}</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ item.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ item.title }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ item.description }}</td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>
-                    {% if item.category %}
-                        {{ item.category.label }}
-                    {% else %}
-                        aucune
-                    {% endif %}   
-                </td>
-            </tr>
-            <tr>
-                <th>Creator</th>
-                <td>{{ item.user.name }}</td>
-            </tr>
-            <tr>
-                <th>MainPicture</th>
-                <td>
-                    {% if item.mainPicture %}
-                        <img src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('view')}}" alt="{{ item.title }}">
-                    {% else %}
-                        <img src="{{ asset('images/no_image.png') | imagine_filter('view')}}" alt="{{ item.title }}">
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- Carousel wrapper -->
+    <div class="row mb-4">
+        <div class="col-xl-6">
+            {% if item.pictures | length < 1 %}
+                <div>
+                    <img class="img-fluid" src="{{ asset('images/no_image.png') | imagine_filter('view')}}" alt="{{ item.title }}">
+                </div>
+            {% elseif item.pictures | length == 1 %}
+                <div>
+                    <img class="img-fluid" src="{{ asset('uploads/' ~ item.pictures[0].path ) | imagine_filter('view')}}" alt="{{ item.title }}">
+                </div>
+            {% else %}
+                <div
+                        id="carouselBasicExample"
+                        class="carousel slide carousel-fade"
+                        data-mdb-ride="carousel"
+                >
+                    <!-- Indicators -->
+                    <div class="carousel-indicators">
+                        {% for picture in item.pictures %}
+                            {% if loop.index == 1 %}
+                                <button
+                                        type="button"
+                                        data-mdb-target="#carouselBasicExample"
+                                        data-mdb-slide-to="{{ loop.index - 1 }}"
+                                        class="active"
+                                        aria-current="true"
+                                        aria-label="Slide {{ loop.index }}"
+                                ></button>
+                            {% else %}
+                                <button
+                                        type="button"
+                                        data-mdb-target="#carouselBasicExample"
+                                        data-mdb-slide-to="{{ loop.index - 1 }}"
+                                        aria-label="Slide {{ loop.index }}"
+                                ></button>
+                            {% endif %}
 
-    <a href="{{ path('item_index') }}">back to list</a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Inner -->
+                    <div class="carousel-inner">
+                        {% for picture in item.pictures %}
+                            <div class="carousel-item {{ loop.index == 1 ? "active" : "" }}">
+                                <img
+                                        src="{{ asset('uploads/' ~ picture.path ) | imagine_filter('view')}}"
+                                        class="d-block w-100"
+                                        alt="{{ item.title }}"
+                                />
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- Inner -->
+
+                    <!-- Controls -->
+                    <button
+                            class="carousel-control-prev"
+                            type="button"
+                            data-mdb-target="#carouselBasicExample"
+                            data-mdb-slide="prev"
+                    >
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button
+                            class="carousel-control-next"
+                            type="button"
+                            data-mdb-target="#carouselBasicExample"
+                            data-mdb-slide="next"
+                    >
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-xl-6">
+            <span class="badge" style="background-color: {{ item.category.color }}">{{ item.category.label }}</span>
+            <p class="">
+                Réalisé par <span class="text-uppercase fs-5">{{ item.user.name }}</span> le <span class="fs-5">{{ item.createdAt | format_datetime('short', 'none', locale='fr')}}</span>
+            </p>
+            <p>
+                {{ item.description | raw }}
+            </p>
+        </div>
+    </div>
+
+
+    {#    commentaires    #}
+    <div class="border p-3">
+        <h2 class="pb-3">Commentaires ({{ item.comments | length }})</h2>
+        {% for comment in item.comments %}
+            <div class="border-bottom p-2 {{ comment.user.id == app.user.id ? "bg-light" : "" }}">
+                <p>
+                    posté par <span class="text-uppercase fs-4">{{ comment.user.name }}</span> le <span class="fs-5">{{ comment.postedAt | format_datetime(locale='fr')}}</span>
+                {% if comment.user.id == app.user.id %}
+                    <a href="{{ path('comment_delete', {id: comment.id, itemId: item.id}) }}"><i class="far text-danger fa-trash-alt"></i></a>
+                {% endif %}
+                </p>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% else %}
+            <p>aucun commentaire</p>
+        {% endfor %}
+        
+        {% if app.user %}
+            {# form #}
+            <div class="mt-2">
+                {{ form_start(form) }}
+                {{ form_row(form.content) }}
+                {{ form_errors(form) }}
+                <button type="submit" class="btn btn-primary mt-2">
+                    Poster
+                </button>
+                {{ form_end(form) }}
+            </div>
+        {% else %}
+            {# connectez vous #}
+            <div>
+                <a href="{{ path('app_login') }}">Connectez-vous</a> pour publier des commentaires
+            </div>
+        {% endif %}
+    </div>
+
+
 {% endblock %}

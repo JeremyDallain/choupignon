@@ -9,26 +9,35 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Email</th>
+
                 <th>Roles</th>
-                <th>Password</th>
                 <th>Name</th>
+                <th>Email</th>
                 <th>RegisteredAt</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for user in users %}
+{#            {{ dump(user.roles) }}#}
             <tr>
                 <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                <td>{{ user.password }}</td>
+
+                <td>
+                    {% if "ROLE_ADMIN" in user.roles %}
+                        Admin
+                    {% endif %}
+                    {% if "ROLE_CREATOR" in user.roles %}
+                        Créateur
+                    {% endif %}
+{#                    {{ user.roles ? user.roles|json_encode : '' }}#}
+                </td>
                 <td>{{ user.name }}</td>
+                <td class="w-auto">{{ user.email }}</td>
                 <td>{{ user.registeredAt ? user.registeredAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('user_show', {'id': user.id}) }}">show</a>
-                    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
+                    <a class="btn btn-danger" href="{{ path('user_delete', {'id': user.id}) }}" onClick="return (confirm('êtes vous sûr de vouloir supprimer ce user ?'))">Supprimer</a>
+{#                    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>#}
                 </td>
             </tr>
         {% else %}
@@ -39,5 +48,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('user_new') }}">Create new</a>
+{#    <a href="{{ path('user_new') }}">Create new</a>#}
 {% endblock %}

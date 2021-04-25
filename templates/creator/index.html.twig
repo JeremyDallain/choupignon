@@ -1,49 +1,142 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CreatorController!
-{% endblock %}
+{% block title %}Mes créations{% endblock %}
 
 
 {% block body %}
-	<ul id="sortable" class="list-unstyled row">
+	<h1>Mes créations</h1>
+	<div id="sortable" class="row">
 		{% for item in items %}
-			<li sort="{{ item.id }}" class="col-12 col-sm-6 col-md-4 col-lg-3">
-				<div class="card">
-					{% if item.getMainPicture %}
-						<img src="{{ asset('uploads/' ~ item.getMainPicture.path) | imagine_filter('list')}}" alt="{{ item.title }}">
-					{% else %}
-						<img class="card-img-top" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">
-					{% endif %}
-					<div class="card-body">
-						<h5 class="card-title">{{ item.id }} - {{ item.title }}</h5>
-						<p class="card-text">{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</p>
-						<p>{{ item.description | u.truncate(50, "...") | raw }}</p>
-						<p>
-							{% if item.category %}
-								{{ item.category.label }}
-							{% else %}
-								aucune
-							{% endif %}
-						</p>
-						<a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>
-                		<a href="{{ path('creator_edit', {'id': item.id}) }}">edit</a> 
+			<div sort="{{ item.id }}" class="col-12">
+				<div class="card mb-3">
+					<div class="row g-0">
+						<div class="col-3">
+							<div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+								<span class="category-badge-card badge" style="background-color: {{ item.category.color }}">{{ item.category.label }}</span>
+								{% if item.mainPicture %}
+									<img class="img-fluid img-thumbnail" src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('creator_list')}}" alt="{{ item.title }}">
+								{% else %}
+									<img class="img-fluid img-thumbnail" src="{{ asset('images/no_image.png') | imagine_filter('creator_list')}}" alt="{{ item.title }}">
+								{% endif %}
+								<a href="{{ path('item_show', {'id': item.id}) }}">
+									<div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>
+								</a>
+							</div>
+						</div>
+						<div class="col-9">
+							<div class="card-body">
+								<h5 class="card-title fs-4">{{ item.title }}</h5>
+								<p class="card-text">
+									{{ item.description | u.truncate(120, "...") }}
+								</p>
+								<p class="card-text">
+									<small class="text-muted">posté le <span class="fs-5">{{ item.createdAt | format_datetime('short', 'none', locale='fr')}}</span></small>
+								</p>
+
+								<a class="btn btn-primary" href="{{ path('item_show', {'id': item.id}) }}">Voir</a>
+								<a class="btn btn-primary" href="{{ path('creator_edit', {'id': item.id}) }}">Modifier</a>
+								<a class="btn btn-danger" href="{{ path('creator_delete', {id: item.id}) }}"onClick="return (confirm('êtes vous sûr de vouloir supprimer cette création ?'))">Supprimer</a>
+								<!-- Buttons trigger collapse -->
+
+								{% if item.comments | length > 0 %}
+								<button
+										class="btn btn-light"
+										type="button"
+										data-mdb-toggle="collapse"
+										data-mdb-target="#commentsCollapse{{ item.id }}"
+										aria-expanded="false"
+										aria-controls="commentsCollapse{{ item.id }}"
+								>
+										<span><i class="far fa-comments"></i> ({{ item.comments | length }})</span>
+								</button>
+								{% else %}
+									<span>aucun commentaire</span>
+								{% endif %}
+
+
+								<!-- Collapsed content -->
+								<div class="collapse mt-3" id="commentsCollapse{{ item.id }}">
+									{% for comment in item.comments %}
+									<div class="border-bottom p-2 {{ comment.user.id == app.user.id ? "bg-light" : "" }}">
+										<p>
+											posté par <span class="text-uppercase fs-4">{{ comment.user.name }}</span> le <span class="fs-5">
+												{{ comment.postedAt | format_datetime(locale='fr')}}</span>
+											{% if comment.user.id == app.user.id %}
+												<a href="{{ path('comment_delete', {id: comment.id, itemId: item.id}) }}">
+													<i class="far text-danger fa-trash-alt"></i></a>
+											{% endif %}
+										</p>
+										<p>{{ comment.content }}</p>
+									</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-			</li>
+
+
+
+{#				<div class="card">#}
+{#					<div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">#}
+{#						<span class="category-badge-card badge" style="background-color: {{ item.category.color }}">{{ item.category.label }}</span>#}
+{#						{% if item.mainPicture %}#}
+{#							<img class="img-fluid img-thumbnail" src="{{ asset('uploads/' ~ item.mainPicture.path ) | imagine_filter('list')}}" alt="{{ item.title }}">#}
+{#						{% else %}#}
+{#							<img class="img-fluid img-thumbnail" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">#}
+{#						{% endif %}#}
+{#						<a href="{{ path('item_show', {'id': item.id}) }}">#}
+{#							<div class="mask" style="background-color: rgba(251, 251, 251, 0.15)"></div>#}
+{#						</a>#}
+{#					</div>#}
+{#					<div class="card-body">#}
+{#						<h3 class="card-title">{{ item.title }}</h3>#}
+{#						<p class="card-text">#}
+{#							Réalisé par <span class="text-uppercase fs-5">{{ item.user.name }}</span> le <span class="fs-5">{{ item.createdAt | format_datetime('short', 'none', locale='fr')}}</span>#}
+{#						</p>#}
+{#						<div class="d-flex justify-content-between">#}
+{#							<a class="btn btn-primary" href="{{ path('item_show', {'id': item.id}) }}">Voir</a>#}
+{#							<a class="btn btn-primary" href="{{ path('creator_edit', {'id': item.id}) }}">Modifier</a>#}
+{#							{% if item.comments | length > 0 %}#}
+{#								<span><i class="far fa-comments"></i> ({{ item.comments | length }})</span>#}
+{#							{% else %}#}
+{#								<span>aucun commentaire</span>#}
+{#							{% endif %}#}
+{#						</div>#}
+
+{#					</div>#}
+{#				</div>#}
+			</div>
 		{% endfor %}
-	</ul>
+	</div>
+{#	<ul id="sortable" class="list-unstyled row">#}
+{#		{% for item in items %}#}
+{#			<li sort="{{ item.id }}" class="col-12 col-sm-6 col-md-4 col-lg-3">#}
+{#				<div class="card">#}
+{#					{% if item.getMainPicture %}#}
+{#						<img src="{{ asset('uploads/' ~ item.getMainPicture.path) | imagine_filter('list')}}" alt="{{ item.title }}">#}
+{#					{% else %}#}
+{#						<img class="card-img-top" src="{{ asset('images/no_image.png') | imagine_filter('list')}}" alt="{{ item.title }}">#}
+{#					{% endif %}#}
+{#					<div class="card-body">#}
+{#						<h5 class="card-title">{{ item.id }} - {{ item.title }}</h5>#}
+{#						<p class="card-text">{{ item.createdAt ? item.createdAt|date('Y-m-d H:i:s') : '' }}</p>#}
+{#						<p>{{ item.description | u.truncate(50, "...") | raw }}</p>#}
+{#						<p>#}
+{#							{% if item.category %}#}
+{#								{{ item.category.label }}#}
+{#							{% else %}#}
+{#								aucune#}
+{#							{% endif %}#}
+{#						</p>#}
+{#						<a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>#}
+{#                		<a href="{{ path('creator_edit', {'id': item.id}) }}">edit</a> #}
+{#					</div>#}
+{#				</div>#}
+{#			</li>#}
+{#		{% endfor %}#}
+{#	</ul>#}
 {% endblock %}
-{# {% block body %}
-    <ul id="sortable" class="list-unstyled">
-        {% for item in items %}
-            <li sort="{{ item.id }}" class="border">
-                <h5 class="card-title">{{ item.title }}</h5>
-                <a href="{{ path('item_show', {'id': item.id}) }}" class="btn btn-primary">Voir</a>
-                <a href="{{ path('creator_edit', {'id': item.id}) }}">edit</a> 
-            </li>
-        {% endfor %}
-    </ul>
-{% endblock %} #}
 
 {% block javascripts %}
 	{{ parent() }}
@@ -53,9 +146,9 @@
 
             $("#sortable").on("sortupdate", function (event, ui) {
                 var sortedIDs = $("#sortable").sortable("toArray", {attribute: "sort"});
-                $('#sortable').parent().prepend('<span id="loading">MAJ</span>')
+                // $('#sortable').parent().prepend('<span id="loading">MAJ</span>')
                 $.post("{{ path("creator_sort_item") }}", { sort: sortedIDs }, function (response) {
-                    $('#loading').remove()
+                    // $('#loading').remove()
                     if (response.status) {} else {
                         alert(response.error)
                     }
