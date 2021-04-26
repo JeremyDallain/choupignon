@@ -98,10 +98,10 @@
     <div class="border p-3">
         <h2 class="pb-3">Commentaires ({{ item.comments | length }})</h2>
         {% for comment in item.comments %}
-            <div class="border-bottom p-2 {{ comment.user.id == app.user.id ? "bg-light" : "" }}">
+            <div class="border-bottom p-2 {{ app.user and comment.user.id == app.user.id ? "bg-light" : "" }}">
                 <p>
                     posté par <span class="text-uppercase fs-4">{{ comment.user.name }}</span> le <span class="fs-5">{{ comment.postedAt | format_datetime(locale='fr')}}</span>
-                {% if comment.user.id == app.user.id %}
+                {% if app.user and comment.user.id == app.user.id %}
                     <a href="{{ path('comment_delete', {id: comment.id, itemId: item.id}) }}"><i class="far text-danger fa-trash-alt"></i></a>
                 {% endif %}
                 </p>
